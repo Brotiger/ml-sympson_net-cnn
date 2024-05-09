@@ -1,0 +1,4 @@
+testset
+train
+.ipynb_checkpoints
+simple_cnn_baseline.csv
