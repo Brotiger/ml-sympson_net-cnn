@@ -44,6 +44,7 @@ class SimpsonNet(nn.Module):
             nn.BatchNorm1d(1200),
             nn.Dropout(0.5),
             nn.ReLU(),
+            nn.Linear(1200, 1200),
             nn.Linear(1200, 42)
         )
 
