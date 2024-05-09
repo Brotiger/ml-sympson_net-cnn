@@ -1,29 +1,27 @@
 import numpy as np
 from torch.utils.data import Dataset
 from PIL import Image
+from torchvision import transforms
+
+RESCALE_SIZE = 224
+DATA_MODES = ['train', 'val', 'test']
 
 class SimpsonsDataset(Dataset):
-    def __init__(self, files, mode):
+    def __init__(self, files, label_encoder, mode):
         super().__init__()
-        # список файлов для загрузки
         self.files = sorted(files)
-        # режим работы
+        self.label_encoder = label_encoder
+
         self.mode = mode
 
         if self.mode not in DATA_MODES:
             print(f"{self.mode} is not correct; correct modes: {DATA_MODES}")
             raise NameError
 
-        self.len_ = len(self.files)
-
-        self.label_encoder = LabelEncoder()
-
         if self.mode != 'test':
             self.labels = [path.parent.name for path in self.files]
-            self.label_encoder.fit(self.labels)
 
-            with open('label_encoder.pkl', 'wb') as le_dump_file:
-                  pickle.dump(self.label_encoder, le_dump_file)
+        self.len_ = len(self.files)
 
     def __len__(self):
         return self.len_
