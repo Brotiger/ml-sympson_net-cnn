@@ -2,17 +2,20 @@ import numpy as np
 from torch.utils.data import Dataset
 from PIL import Image
 from torchvision import transforms
+import os
 
 RESCALE_SIZE = 224
 DATA_MODES = ['train', 'val', 'test']
 
-class SimpsonsDataset(Dataset):
+class SimpsonDataset(Dataset):
     def __init__(self, files, label_encoder, mode):
         super().__init__()
-        self.files = sorted(files)
+        self.files = files
         self.label_encoder = label_encoder
-
         self.mode = mode
+
+        if self.mode == 'test':
+            self.files = sorted(files, key=self.extract_image_number)
 
         if self.mode not in DATA_MODES:
             print(f"{self.mode} is not correct; correct modes: {DATA_MODES}")
@@ -29,6 +32,10 @@ class SimpsonsDataset(Dataset):
     def load_sample(self, file):
         image = Image.open(file)
         return image
+
+    def extract_image_number(self, path):
+        filename = os.path.basename(path)
+        return int(filename[3:-4])
 
     def __getitem__(self, index):
         # для преобразования изображений в тензоры PyTorch и нормализации входа

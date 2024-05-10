@@ -1,6 +1,6 @@
 from tqdm import tqdm
 import torch.distributed as dist
-from src.dataset import SimpsonsDataset
+from src.dataset import SimpsonDataset
 from src.simpson_net import SimpsonNet
 from torch.utils.data import DataLoader
 from torch import nn
@@ -73,8 +73,8 @@ def train(gpu, train_val_files, gpu_count, batch_size, epochs, label_encoder, st
     train_val_labels = [path.parent.name for path in train_val_files]
     train_files, val_files = train_test_split(train_val_files, test_size=0.25, stratify=train_val_labels)
 
-    val_dataset = SimpsonsDataset(val_files, label_encoder, mode='val')
-    train_dataset = SimpsonsDataset(train_files, label_encoder, mode='train')
+    val_dataset = SimpsonDataset(val_files, label_encoder, mode='val')
+    train_dataset = SimpsonDataset(train_files, label_encoder, mode='train')
 
     train_sampler = torch.utils.data.distributed.DistributedSampler(
         train_dataset,
@@ -120,7 +120,7 @@ def train(gpu, train_val_files, gpu_count, batch_size, epochs, label_encoder, st
     model = SimpsonNet()
     model.cuda(gpu)
 
-    opt = torch.optim.Adam(model.parameters(), lr=0.0005)
+    opt = torch.optim.Adam(model.parameters(), lr=0.0005, weight_decay=1e-3)
     criterion = nn.CrossEntropyLoss().cuda(gpu)
     model = nn.parallel.DistributedDataParallel(model, device_ids=[gpu])
     
